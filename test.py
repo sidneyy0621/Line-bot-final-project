@@ -1,2 +1,5 @@
 print('Love you')
-print('wwwwwww')
+
+=======
+print('aaa')
+>>>>>>> refs/remotes/origin/main
