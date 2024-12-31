@@ -4,12 +4,20 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, JoinEvent, SourceUser, SourceGroup
 from linebot.exceptions import InvalidSignatureError
 from flask import Flask, request, abort
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 app = Flask(__name__)
 
 # Line Bot API and Webhook Handler
-line_bot_api = LineBotApi('LWcnU1ZzDEyosN8tlt/2lnpXkIoyfgkKll4/D2mphILA4SIypGYajxf2fPcz/jgoUS6y94gIJZEQVWV+bTK4ZsUKECgPpFuxOmMUN9feCknhAz01NwUUBvR9RuX80gtYuAGtULkiPBCf+DYwM8kXHgdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('b21bf0fbc6b8beda46a6496a1cc480e6')
+line_bot_api = LineBotApi('W2csGypPz8dXqnt/nBvfOpHdbFcpMxlSh/lZBhPjhbenvACmhEA3KnoTku+AbWz8gHQMOTS0C6itjOWiiqM6pNnlbsY2MS4vdK+a17SNGybjC/3Q0xRFP4ovsQ+PgX7JvrW9ed8K0UXFGRU8G3GoVAdB04t89/1O/w1cDnyilFU=')
+handler = WebhookHandler('8b0b86eeb21a43e7a91dfcc70e658b4f')
+
+# Google Sheets API setup
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name("savvy-folio-351502-fe45cf55a3ed.json", scope)
+client = gspread.authorize(creds)
+sheet = client.open("linebot").sheet1
 
 # In-memory storage for reminders
 reminders = []
@@ -44,14 +52,20 @@ def add_reminder(text, source_id):
         'note': note,
         'assignee': assignee,
         'completed': False,
-        'group_id': source_id
+        'source_id': source_id
     })
+    # Add reminder to Google Sheets
+    sheet.append_row([due_date, content, note, assignee, "未完成", source_id])
 
 def delete_reminder(text):
     global reminders
     reminders = [reminder for reminder in reminders if not (
         f"須完成日期：{reminder['due_date']}\n預計完成內容：{reminder['content']}\n註：{reminder['note']}\n誰的工作：{reminder['assignee']}" == text
     )]
+    # Delete reminder from Google Sheets
+    cell = sheet.find(text.split('\n')[1].split('：')[1].strip())
+    if cell:
+        sheet.delete_row(cell.row)
 
 def notify_user(text, action, source_id):
     lines = text.split('\n')
@@ -119,7 +133,6 @@ def handle_join(event):
         TextSendMessage(text="大家好😲！我是你各位的提醒機器人，請輸入'新增提醒'來新增提醒事項。"),
         TextSendMessage(text="各位也可以在群組中討論事情喔！")
     ])
-
 
 if __name__ == "__main__":
     app.run()
