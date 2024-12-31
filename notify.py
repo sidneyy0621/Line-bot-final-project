@@ -10,7 +10,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 app = Flask(__name__)
 
 # Line Bot API and Webhook Handler
-line_bot_api = LineBotApi('W2csGypPz8dXqnt/nBvfOpHdbFcpMxlSh/lZBhPjhbenvACmhEA3KnoTku+AbWz8gHQMOTS0C6itjOWiiqM6pNnlbsY2MS4vdK+a17SNGybjC/3Q0xRFP4ovsQ+PgX7JvrW9ed8K0UXFGRU8G3GoVAdB04t89/1O/w1cDnyilFU=')
+line_bot_api = LineBotApi('your_channel_access_token')
 handler = WebhookHandler('8b0b86eeb21a43e7a91dfcc70e658b4f')
 
 # Google Sheets API setup

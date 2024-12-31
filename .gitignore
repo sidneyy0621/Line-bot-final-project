@@ -1,0 +1,4 @@
+# 忽略清單
+.env
+test.py
+sidney1219.py
