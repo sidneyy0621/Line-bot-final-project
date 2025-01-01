@@ -6,13 +6,15 @@ from linebot.exceptions import InvalidSignatureError
 from flask import Flask, request, abort
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from dotenv import load_dotenv
+
+load_dotenv()  # 載入 .env 檔案
 
 app = Flask(__name__)
 
 # Line Bot API and Webhook Handler
-# 請將 your_channel_secret 替換為你的 Channel Secret
-line_bot_api = LineBotApi('W2csGypPz8dXqnt/nBvfOpHdbFcpMxlSh/lZBhPjhbenvACmhEA3KnoTku+AbWz8gHQMOTS0C6itjOWiiqM6pNnlbsY2MS4vdK+a17SNGybjC/3Q0xRFP4ovsQ+PgX7JvrW9ed8K0UXFGRU8G3GoVAdB04t89/1O/w1cDnyilFU=') # 請將 your_channel_access_token 替換為你的 Channel Access Token
-handler = WebhookHandler('8b0b86eeb21a43e7a91dfcc70e658b4f') 
+line_bot_api = LineBotApi(os.getenv('your_channel_access_token')) # 請將 your_channel_access_token 替換為你的 Channel Access Token
+handler = WebhookHandler(os.getenv('your_channel_secret'))  # 請將 your_channel_secret 替換為你的 Channel Secret
 
 # Google Sheets API setup
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
