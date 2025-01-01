@@ -4,14 +4,21 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, JoinEvent, SourceUser, SourceGroup
 from linebot.exceptions import InvalidSignatureError
 from flask import Flask, request, abort
-
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 app = Flask(__name__)
 
 # Line Bot API and Webhook Handler
 # 請將 your_channel_secret 替換為你的 Channel Secret
-line_bot_api = LineBotApi('LWcnU1ZzDEyosN8tlt/2lnpXkIoyfgkKll4/D2mphILA4SIypGYajxf2fPcz/jgoUS6y94gIJZEQVWV+bTK4ZsUKECgPpFuxOmMUN9feCknhAz01NwUUBvR9RuX80gtYuAGtULkiPBCf+DYwM8kXHgdB04t89/1O/w1cDnyilFU=') # 請將 your_channel_access_token 替換為你的 Channel Access Token
-handler = WebhookHandler('b21bf0fbc6b8beda46a6496a1cc480e6') 
+line_bot_api = LineBotApi('W2csGypPz8dXqnt/nBvfOpHdbFcpMxlSh/lZBhPjhbenvACmhEA3KnoTku+AbWz8gHQMOTS0C6itjOWiiqM6pNnlbsY2MS4vdK+a17SNGybjC/3Q0xRFP4ovsQ+PgX7JvrW9ed8K0UXFGRU8G3GoVAdB04t89/1O/w1cDnyilFU=') # 請將 your_channel_access_token 替換為你的 Channel Access Token
+handler = WebhookHandler('8b0b86eeb21a43e7a91dfcc70e658b4f') 
+
+# Google Sheets API setup
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name("savvy-folio-351502-7afc3bcb4050.json", scope)
+client = gspread.authorize(creds)
+sheet = client.open("linebot2025").sheet1
 
 # In-memory storage for reminders
 reminders = []
