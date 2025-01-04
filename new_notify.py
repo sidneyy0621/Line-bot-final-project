@@ -16,6 +16,12 @@ app = Flask(__name__)
 line_bot_api = LineBotApi(os.getenv('your_channel_access_token')) 
 handler = WebhookHandler(os.getenv('your_channel_secret'))
 
+# Google Sheets API setup
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name(os.getenv('your_json_keyfile'), scope)
+client = gspread.authorize(creds)
+sheet = client.open("linebot").sheet1
+
 # In-memory storage for reminders
 reminders = []
 delete_mode = False
