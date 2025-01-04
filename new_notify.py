@@ -18,9 +18,9 @@ handler = WebhookHandler(os.getenv('your_channel_secret'))  # 請將 your_channe
 
 # Google Sheets API setup
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("savvy-folio-351502-7afc3bcb4050.json", scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name("savvy-folio-351502-f996cb106b8e.json", scope)
 client = gspread.authorize(creds)
-sheet = client.open("linebot2025").sheet1
+sheet = client.open("linebot").sheet1
 
 # In-memory storage for reminders
 reminders = []
@@ -57,12 +57,26 @@ def add_reminder(text, source_id):
         'completed': False,
         'group_id': source_id
     })
+    try:
+        # Add reminder to Google Sheets
+        sheet.append_row([due_date, content, note, assignee, "未完成", source_id])
+        print("成功將記錄添加到 Google Sheets")
+    except Exception as e:
+        print(f"無法將記錄添加到 Google Sheets: {e}")
 
 def delete_reminder(text):
     global reminders
     reminders = [reminder for reminder in reminders if not (
         f"須完成日期：{reminder['due_date']}\n預計完成內容：{reminder['content']}\n註：{reminder['note']}\n誰的工作：{reminder['assignee']}" == text
     )]
+    try:
+        # Delete reminder from Google Sheets
+        cell = sheet.find(text.split('\n')[1].split('：')[1].strip())
+        if cell:
+            sheet.delete_rows(cell.row)
+            print("成功將記錄從 Google Sheets 刪除")
+    except Exception as e:
+        print(f"無法將記錄從 Google Sheets 刪除: {e}")
 
 def notify_user(text, action, source_id):
     lines = text.split('\n')
