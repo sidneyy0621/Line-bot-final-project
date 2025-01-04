@@ -18,7 +18,7 @@ handler = WebhookHandler(os.getenv('your_channel_secret'))  # 請將 your_channe
 
 # Google Sheets API setup
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("savvy-folio-351502-f996cb106b8e.json", scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name(os.getenv('your_json_keyfile'), scope)
 client = gspread.authorize(creds)
 sheet = client.open("linebot").sheet1
 
