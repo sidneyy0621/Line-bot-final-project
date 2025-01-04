@@ -13,8 +13,8 @@ load_dotenv()  # 載入 .env 檔案
 app = Flask(__name__)
 
 # Line Bot API and Webhook Handler
-line_bot_api = LineBotApi(os.getenv('your_channel_access_token')) # 請將 your_channel_access_token 替換為你的 Channel Access Token
-handler = WebhookHandler(os.getenv('your_channel_secret'))  # 請將 your_channel_secret 替換為你的 Channel Secret
+line_bot_api = LineBotApi(os.getenv('your_channel_access_token')) 
+handler = WebhookHandler(os.getenv('your_channel_secret'))
 
 # Google Sheets API setup
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
