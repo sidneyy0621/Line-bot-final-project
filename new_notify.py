@@ -37,11 +37,6 @@ def callback():
     return 'OK'
 
 def list_reminders(completed, source_id):
-    # result = []
-    # for reminder in reminders:
-    #     if reminder['completed'] == completed and reminder['source_id'] == source_id:
-    #         result.append(f"須完成日期：{reminder['due_date']}\n預計完成內容：{reminder['content']}\n註：{reminder['note']}\n誰的工作：{reminder['assignee']}")
-    # return "\n\n".join(result)
     try:
         # Fetch all records from Google Sheets
         records = sheet.get_all_records()
