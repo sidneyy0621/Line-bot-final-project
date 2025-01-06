@@ -37,11 +37,30 @@ def callback():
     return 'OK'
 
 def list_reminders(completed, source_id):
-    result = []
-    for reminder in reminders:
-        if reminder['completed'] == completed and reminder['source_id'] == source_id:
-            result.append(f"須完成日期：{reminder['due_date']}\n預計完成內容：{reminder['content']}\n註：{reminder['note']}\n誰的工作：{reminder['assignee']}")
-    return "\n\n".join(result)
+    # result = []
+    # for reminder in reminders:
+    #     if reminder['completed'] == completed and reminder['source_id'] == source_id:
+    #         result.append(f"須完成日期：{reminder['due_date']}\n預計完成內容：{reminder['content']}\n註：{reminder['note']}\n誰的工作：{reminder['assignee']}")
+    # return "\n\n".join(result)
+    try:
+        # Fetch all records from Google Sheets
+        records = sheet.get_all_records()
+        result = []
+        for record in records:
+            if record["completed"] == '未完成':
+                result.append(f"須完成日期：{record['due_date']}\n預計完成內容：{record['content']}\n註：{record['note']}\n誰的工作：{record['assignee']}")
+        
+        # Check if there are any reminders
+        if result:
+            return "\n\n".join(result)
+        else:
+            return "無未完成提醒"
+    except gspread.exceptions.APIError as e:
+        print(f"Google Sheets API 錯誤: {e}")
+        return "無法從 Google Sheets 獲取記錄"
+    except Exception as e:
+        print(f"無法從 Google Sheets 獲取記錄: {e}")
+        return "無法從 Google Sheets 獲取記錄"
 
 def add_reminder(text, source_id):
     lines = text.split('\n')
