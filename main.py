@@ -129,7 +129,7 @@ def handle_message(event):
     if text == "新增提醒":
         line_bot_api.reply_message(event.reply_token, [
             TextSendMessage(text="請依照以下格式上傳提醒："),
-            TextSendMessage(text="須完成日期：\n預計完成內容：\n註：\n誰的工作：")
+            TextSendMessage(text="須完成日期：YYYY/MM/DD\n預計完成內容：\n註：\n誰的工作：")
         ])
 
     elif text == "刪除提醒":
@@ -167,6 +167,12 @@ def handle_message(event):
         mark_reminder_as_completed(text)
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="提醒事項已標示為完成"))
 
+    elif text == "定時提醒":
+        line_bot_api.reply_message(event.reply_token, [
+            TextSendMessage(text="請依照以下格式設定定時提醒："),
+            TextSendMessage(text="定時提醒：\n須完成日期：YYYY/MM/DD\n預計完成內容：\n註：\n誰的工作：\n間隔時間：秒數")
+        ])    
+        
     elif text.startswith("定時提醒："):
         lines = text.split('\n')
         try:
