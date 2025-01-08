@@ -122,6 +122,10 @@ def handle_message(event):
             TextSendMessage(text=list_reminders(False, source_id))
         ])
 
+    elif text.startswith("完成提醒："):
+        mark_reminder_as_completed(text)
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="提醒事項已標示為完成"))
+
 @handler.add(JoinEvent)
 def handle_join(event):
     line_bot_api.reply_message(event.reply_token, [
@@ -234,6 +238,17 @@ def delete_reminder(text):
             print("成功將記錄從 Google Sheets 刪除")
     except Exception as e:
         print(f"無法將記錄從 Google Sheets 刪除: {e}")
+
+def mark_reminder_as_completed(text):
+    try:
+        # Find the reminder in Google Sheets
+        cell = sheet.find(text.split('\n')[1].split('：')[1].strip())
+        if cell:
+            # Update the 'completed' status to '已完成'
+            sheet.update_cell(cell.row, 5, '已完成')
+            print("成功將記錄標示為已完成")
+    except Exception as e:
+        print(f"無法將記錄標示為已完成: {e}")
 
 def notify_user(text, action, source_id):
     lines = text.split('\n')
