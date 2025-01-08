@@ -335,7 +335,7 @@ def send_daily_reminders():
                 group_id = reminder.get("group_id", "")
                 if group_id:
                     print(f"推送提醒：{reminder_text}")  # 確保推送提醒的內容正確
-                    notify_user(reminder_text, "提醒", group_id)
+                    send_personalized_notification(reminder_text, "提醒", group_id)
 
         else:
             print("無未完成事項需要提醒")
@@ -360,7 +360,7 @@ setup_daily_reminder()
 
 # 確保推送功能正常運行
 
-def notify_user(text, action, source_id):
+def send_personalized_notification(text, action, source_id):
     if not source_id:
         print("錯誤：無效的 group_id 或 user_id，無法推送訊息")
         return
