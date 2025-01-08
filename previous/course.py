@@ -35,7 +35,6 @@ response = session.get(course_url, verify=False)
 if response.status_code == 200:
     soup = BeautifulSoup(response.text, 'html.parser')
     
-    # 假設課表在一個表格中
     table = soup.find('table', {'class': 'table'})
     if table:
         rows = table.find_all('tr')

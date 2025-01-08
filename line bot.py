@@ -7,7 +7,6 @@ from course import get_course_schedule  # 匯入 course.py 中的 get_course_sch
 
 app = Flask(__name__)
 
-# 設定你的 LINE Bot 的 Channel Secret 和 Channel Access Token
 LINE_CHANNEL_SECRET = 'bac7c9b32606fec4d5a74c9dca80eb9b'
 LINE_CHANNEL_ACCESS_TOKEN = 'wrtAKskRx/HK6GFU7/1Cur3rU57ieem3lS2jrSyAlQN8x0nxJi4xtlMlk7+DpQ1f+Ea4VEQs6P2BfdlbNj99S0CG24wUmR6YKNWUDy9WQaxIXO+jUjy5DfIudJInjzghPvv2e9WpcUDv56WXaXeFYAdB04t89/1O/w1cDnyilFU='
 
