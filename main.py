@@ -11,6 +11,18 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import threading
 import time
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.jobstores.base import ConflictingIdError
+from pytz import timezone
+
+load_dotenv()  # 載入 .env 檔案
+
+# 初始化 Scheduler 並設定時區
+taiwan_tz = timezone('Asia/Taipei')
+scheduler = BackgroundScheduler(timezone=taiwan_tz)
+
+# 啟動 Scheduler
+scheduler.start()
 
 load_dotenv()  # 載入 .env 檔案
 
@@ -290,6 +302,76 @@ def mark_reminder_as_completed(text):
             print("成功將記錄標示為已完成")
     except Exception as e:
         print(f"無法將記錄標示為已完成: {e}")
+
+def send_daily_reminders():
+    try:
+        # 獲取所有記錄
+        records = sheet.get_all_records()
+        now = datetime.now(taiwan_tz)
+        today_date = now.strftime("%Y-%m-%d")  # 今日日期
+
+        # 篩選未完成且日期未到的事項
+        reminders_to_notify = []
+        for record in records:
+            due_date = record["due_date"]
+            completed = record["completed"]
+
+            # 只篩選未完成且日期未到的事項，無視是否已提醒
+            if completed == "未完成" and due_date >= today_date:
+                reminders_to_notify.append(record)
+
+        # 整理提醒內容並推送
+        if reminders_to_notify:
+            for reminder in reminders_to_notify:
+                reminder_text = (
+                    f"🔸 須完成日期：{reminder['due_date']}\n"
+                    f"內容：{reminder['content']}\n"
+                    f"備註：{reminder['note']}\n"
+                    f"負責人：{reminder['assignee']}\n\n"
+                )
+                group_id = reminder.get("group_id", "")
+                if group_id:
+                    print(f"推送提醒：{reminder_text}")  # 確保推送提醒的內容正確
+                    notify_user(reminder_text, "提醒", group_id)
+
+        else:
+            print("無未完成事項需要提醒")
+    except Exception as e:
+        print(f"每日提醒功能錯誤：{e}")
+
+# 確保排程任務只會執行一次
+def schedule_reminder():
+    try:
+        # 檢查是否已有排程任務
+        job = scheduler.get_job('daily_reminder')
+        if not job:
+            scheduler.add_job(send_daily_reminders, 'cron', hour=19, minute=4, id='daily_reminder', replace_existing=True)
+            print("成功設置每日提醒排程")
+        else:
+            print("每日提醒排程任務已存在，跳過新增")
+    except Exception as e:
+        print(f"排程錯誤：{e}")
+
+# 呼叫排程函數
+schedule_reminder()
+
+# 確保推送功能正常運行
+
+def notify_user(text, action, source_id):
+    if not source_id:
+        print("錯誤：無效的 group_id 或 user_id，無法推送訊息")
+        return
+
+    lines = text.split('\n')
+    assignee = lines[3].split('：')[1].strip()
+    try:
+        if action == "新增":
+            line_bot_api.push_message(source_id, TextSendMessage(text=f"@{assignee} 明天開始將會是充實的一天！😊\n{text}"))
+        elif action == "提醒":
+            line_bot_api.push_message(source_id, TextSendMessage(text=f"@{assignee} 你的工作完成了嗎?😒\n{text}"))
+        print(f"已成功推送提醒訊息給 {source_id}")  # 確保訊息有成功推送
+    except Exception as e:
+        pass
 
 if __name__ == "__main__":
     app.run(debug=True)
