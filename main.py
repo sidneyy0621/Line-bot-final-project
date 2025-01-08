@@ -53,6 +53,7 @@ def callback():
         abort(400)
     return 'OK'
 
+# 提醒事項排程與通知
 def schedule_reminder(text, interval, source_id):
     def reminder():
         while True:
@@ -83,6 +84,7 @@ def notify_user(message, title, source_id):
     except Exception as e:
         line_bot_api.push_message(source_id, TextSendMessage(text=f"發生錯誤：{e}"))
 
+# 處理 LINE Bot 訊息事件
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     global delete_mode
@@ -182,6 +184,7 @@ def handle_message(event):
         except ValueError:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text="請輸入有效的時間間隔（秒）"))
 
+# 處理 LINE Bot 加入群組事件
 @handler.add(JoinEvent)
 def handle_join(event):
     line_bot_api.reply_message(event.reply_token, [
@@ -189,6 +192,7 @@ def handle_join(event):
         TextSendMessage(text="各位也可以在群組中討論事情喔！")
     ])
 
+# 抓課表
 def get_course_schedule(account, password):
     login_url = 'https://mobile.nkust.edu.tw/Account/Login'
     course_url = 'https://mobile.nkust.edu.tw/Student/Course'
@@ -306,6 +310,7 @@ def mark_reminder_as_completed(text):
     except Exception as e:
         print(f"無法將記錄標示為已完成: {e}")
 
+# 每日提醒功能
 def send_daily_reminders():
     try:
         # 獲取所有記錄
@@ -359,7 +364,7 @@ def setup_daily_reminder():
 setup_daily_reminder()
 
 # 確保推送功能正常運行
-
+# 推送通知功能
 def send_personalized_notification(text, action, source_id):
     if not source_id:
         print("錯誤：無效的 group_id 或 user_id，無法推送訊息")
