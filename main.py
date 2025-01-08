@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import threading
+import time
 
 load_dotenv()  # 載入 .env 檔案
 
@@ -40,6 +42,36 @@ def callback():
     except InvalidSignatureError:
         abort(400)
     return 'OK'
+
+def notify_user(message, title, source_id):
+    try:
+        lines = message.split('\n')
+        if title == "提醒":
+            if len(lines) < 5:
+                raise IndexError("訊息行數不足")
+            due_date = lines[1].split('：')[1].strip()
+            content = lines[2].split('：')[1].strip()
+            note = lines[3].split('：')[1].strip()
+            assignee = lines[4].split('：')[1].strip()
+            reminder_message = f"{title}：\n須完成日期：{due_date}\n預計完成內容：{content}\n註：{note}\n誰的工作：{assignee}"
+        else:
+            reminder_message = message
+        line_bot_api.push_message(source_id, TextSendMessage(text=reminder_message))
+    except IndexError as e:
+        line_bot_api.push_message(source_id, TextSendMessage(text=f"提醒訊息格式錯誤，請確認輸入格式。錯誤：{e}"))
+    except Exception as e:
+        line_bot_api.push_message(source_id, TextSendMessage(text=f"發生錯誤：{e}"))
+
+def schedule_reminder(text, interval, source_id):
+    def reminder():
+        while True:
+            time.sleep(interval)
+            reminder_message = f"您還有以下任務沒完成：\n{text}"
+            notify_user(reminder_message, "提醒", source_id)
+    
+    reminder_thread = threading.Thread(target=reminder)
+    reminder_thread.daemon = True
+    reminder_thread.start()
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -125,6 +157,15 @@ def handle_message(event):
     elif text.startswith("完成提醒："):
         mark_reminder_as_completed(text)
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="提醒事項已標示為完成"))
+
+    elif text.startswith("定時提醒："):
+        lines = text.split('\n')
+        try:
+            interval = int(lines[5].split('：')[1].strip())  # 直接使用秒數
+            schedule_reminder('\n'.join(lines[1:5]), interval, source_id)
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text="定時提醒已設定"))
+        except ValueError:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text="請輸入有效的時間間隔（秒）"))
 
 @handler.add(JoinEvent)
 def handle_join(event):
@@ -249,14 +290,6 @@ def mark_reminder_as_completed(text):
             print("成功將記錄標示為已完成")
     except Exception as e:
         print(f"無法將記錄標示為已完成: {e}")
-
-def notify_user(text, action, source_id):
-    lines = text.split('\n')
-    assignee = lines[3].split('：')[1].strip()
-    if action == "新增":
-        line_bot_api.push_message(source_id, TextSendMessage(text=f"@{assignee} 明天開始將會是充實的一天！😊\n{text}"))
-    elif action == "提醒":
-        line_bot_api.push_message(source_id, TextSendMessage(text=f"@{assignee} 你的工作完成了嗎?😒\n{text}"))
 
 if __name__ == "__main__":
     app.run(debug=True)
