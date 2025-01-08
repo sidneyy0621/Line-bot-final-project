@@ -10,7 +10,17 @@
 - [課表查詢](#課表查詢)
 - [加入群組](#加入群組)
 
-4.[技術支援](#技術支援)
+4.[操作畫面](#操作畫面)
+- [加入好友（個人）](#加入好友（個人）)
+- [加入好友（群組）](#加入好友（群組）)
+- [選單畫面](#選單畫面)
+- [新增提醒](#新增提醒)
+- [刪除提醒](#刪除提醒)
+- [未完成的提醒](#未完成的提醒)
+- [課表查詢](#課表查詢)
+- [群組](#群組)
+
+5.[技術支援](#技術支援)
 
 ---
 
@@ -54,22 +64,42 @@
 ---
 ## 操作畫面
 ##### 加入好友（個人）
-![add_friend.jpg](./pic/add_friend.jpg)
-##### 加入好友（群組）
-![add_friend2.jpg](./pic/add_friend2.jpg)
-##### 選單畫面
-![選單.png](./pic/選單.png)
-##### 新增提醒
-![insert.png](./pic/insert.png)
-##### 刪除提醒
-![delete.png](./pic/delete.png)
-##### 未完成的提醒
-![未完成.png](./pic/未完成.png)
-##### 課表查詢
-![course.png](./pic/course.png)
-##### 群組
-![group_test.png](./pic/group_test.png)
+<img src="./pic/add_friend.jpg" alt="add_friend.jpg" width="250"/>
 
+##### 加入好友（群組）
+<img src="./pic/add_friend2.jpg" alt="add_friend2.jpg" width="250"/>
+
+##### 選單畫面
+<img src="./pic/選單.png" alt="選單.png" width="250"/>
+
+##### 新增提醒
+<img src="./pic/insert.png" alt="insert.png" width="250"/>
+
+##### 刪除提醒
+<img src="./pic/delete.png" alt="delete.png" width="250"/>
+
+##### 未完成的提醒
+<img src="./pic/未完成.png" alt="未完成.png" width="250"/>
+
+##### 課表查詢
+<img src="./pic/course.png" alt="course.png" width="250"/>
+
+##### 群組
+<img src="./pic/group_test.png" alt="group_test.png" width="250"/>
+
+---
+## 系統設計與架構
+##### 開發工具
+- 程式語言： Python
+- 框架及套件： Flask、requests、bs4、linebot...
+- 資料庫： Google sheet
+- 編輯器： Visual Studio Code
+- Line Bot API： 使用Line官方提供的API開發和管理LineBot功能
+
+
+##### 系統設計
+![系統設計圖.png](./pic/系統設計圖.png)
+ 
 ---
 ## 技術支援
 若有任何問題，請聯繫開發團隊：
