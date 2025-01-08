@@ -24,8 +24,6 @@ scheduler = BackgroundScheduler(timezone=taiwan_tz)
 # 啟動 Scheduler
 scheduler.start()
 
-load_dotenv()  # 載入 .env 檔案
-
 app = Flask(__name__)
 
 # 設定你的 LINE Bot 的 Channel Secret 和 Channel Access Token
@@ -55,6 +53,17 @@ def callback():
         abort(400)
     return 'OK'
 
+def schedule_reminder(text, interval, source_id):
+    def reminder():
+        while True:
+            time.sleep(interval)
+            reminder_message = f"您還有以下任務沒完成：\n{text}"
+            notify_user(reminder_message, "提醒", source_id)
+    
+    reminder_thread = threading.Thread(target=reminder)
+    reminder_thread.daemon = True
+    reminder_thread.start()
+
 def notify_user(message, title, source_id):
     try:
         lines = message.split('\n')
@@ -73,17 +82,6 @@ def notify_user(message, title, source_id):
         line_bot_api.push_message(source_id, TextSendMessage(text=f"提醒訊息格式錯誤，請確認輸入格式。錯誤：{e}"))
     except Exception as e:
         line_bot_api.push_message(source_id, TextSendMessage(text=f"發生錯誤：{e}"))
-
-def schedule_reminder(text, interval, source_id):
-    def reminder():
-        while True:
-            time.sleep(interval)
-            reminder_message = f"您還有以下任務沒完成：\n{text}"
-            notify_user(reminder_message, "提醒", source_id)
-    
-    reminder_thread = threading.Thread(target=reminder)
-    reminder_thread.daemon = True
-    reminder_thread.start()
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -119,7 +117,6 @@ def handle_message(event):
         password = user_data[user_id]['password']
         reply_text = get_course_schedule(account, password)  # 呼叫 get_course_schedule 函數取得課表
         user_data[user_id]['step'] = 0  # Reset the step after getting the schedule
-    
 
     try:
         line_bot_api.reply_message(
@@ -174,7 +171,7 @@ def handle_message(event):
         lines = text.split('\n')
         try:
             interval = int(lines[5].split('：')[1].strip())  # 直接使用秒數
-            schedule_reminder('\n'.join(lines[1:5]), interval, source_id)
+            schedule_reminder('\n'.join(lines[1:6]), interval, source_id)
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text="定時提醒已設定"))
         except ValueError:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text="請輸入有效的時間間隔（秒）"))
@@ -340,7 +337,7 @@ def send_daily_reminders():
         print(f"每日提醒功能錯誤：{e}")
 
 # 確保排程任務只會執行一次
-def schedule_reminder():
+def setup_daily_reminder():
     try:
         # 檢查是否已有排程任務
         job = scheduler.get_job('daily_reminder')
@@ -353,7 +350,7 @@ def schedule_reminder():
         print(f"排程錯誤：{e}")
 
 # 呼叫排程函數
-schedule_reminder()
+setup_daily_reminder()
 
 # 確保推送功能正常運行
 
