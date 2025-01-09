@@ -353,7 +353,7 @@ def setup_daily_reminder():
         # 檢查是否已有排程任務
         job = scheduler.get_job('daily_reminder')
         if not job:
-            scheduler.add_job(send_daily_reminders, 'cron', hour=9, minute=20, id='daily_reminder', replace_existing=True)
+            scheduler.add_job(send_daily_reminders, 'cron', hour=9, minute=30, id='daily_reminder', replace_existing=True)
             print("成功設置每日提醒排程")
         else:
             print("每日提醒排程任務已存在，跳過新增")
