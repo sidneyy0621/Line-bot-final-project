@@ -17,6 +17,8 @@
    - [新增提醒](#新增提醒)
    - [刪除提醒](#刪除提醒)
    - [未完成的提醒](#未完成的提醒)
+   - [重複提醒](#重複提醒)
+   - [固定時間時醒](#固定時間時醒)
    - [課表查詢](#課表查詢)
    - [群組](#群組)
 
@@ -86,6 +88,12 @@
 ##### 未完成的提醒
 <img src="./pic/未完成.png" alt="未完成.png" width="250"/>
 
+##### 重複提醒
+<img src="./pic/定時.png" alt="定時.png" width="250"/>
+
+##### 固定時間時醒
+<img src="./pic/固定時間時醒.png" alt="固定時間時醒.png" width="250"/>
+
 ##### 課表查詢
 <img src="./pic/course.png" alt="course.png" width="250"/>
 
@@ -97,7 +105,7 @@
 ## 系統設計與架構
 ##### 開發工具
 - 程式語言： Python
-- 框架及套件： Flask、requests、bs4、linebot...
+- 框架及套件： Flask、requests、bs4、linebot、apscheduler...
 - 資料庫： Google sheet
 - 編輯器： Visual Studio Code
 - Line Bot API： 使用Line官方提供的API開發和管理LineBot功能
