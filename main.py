@@ -19,7 +19,7 @@ load_dotenv()  # 載入 .env 檔案
 
 # 初始化 Scheduler 並設定時區
 taiwan_tz = timezone('Asia/Taipei')
-scheduler = BackgroundScheduler(timezone=taiwan_tz)
+scheduler = BackgroundScheduler()
 
 # 啟動 Scheduler
 scheduler.start()
@@ -353,10 +353,12 @@ def setup_daily_reminder():
         # 檢查是否已有排程任務
         job = scheduler.get_job('daily_reminder')
         if not job:
-            scheduler.add_job(send_daily_reminders, 'cron', hour=9, minute=35, id='daily_reminder', replace_existing=True)
+            scheduler.add_job(send_daily_reminders, 'cron', hour=9, minute=52, id='daily_reminder')
             print("成功設置每日提醒排程")
         else:
             print("每日提醒排程任務已存在，跳過新增")
+    except ConflictingIdError:
+        print("排程任務 ID 衝突，跳過新增")
     except Exception as e:
         print(f"排程錯誤：{e}")
 
